@@ -42,19 +42,19 @@ class DenseClip(nn.Module):
         x = self.visual.avgpool(x)
         return x
 
-    def encode_image(self, x):
-        x = x.type(self.dtype)
-        x = self._stem(x)
-        x = self.visual.layer1(x)
-        x = self.visual.layer2(x)
-        x = self.visual.layer3(x)
-        x = self.visual.layer4(x)
+    def encode_image(self, image):
+        image = image.type(self.dtype)
+        feature = self._stem(image)
+        feature = self.visual.layer1(feature)
+        feature = self.visual.layer2(feature)
+        feature = self.visual.layer3(feature)
+        feature = self.visual.layer4(feature)
 
         # removed attnpool
-        x = self.conv1(x)
-        x = self.conv2(x)
+        feature = self.conv1(feature)
+        feature = self.conv2(feature)
 
-        return x
+        return feature
 
     def forward(self, x):
         pass
