@@ -179,14 +179,15 @@ class DenseClip(nn.Module):
 
         return feature
 
-    def encode_text(self, text):
-        self.clip_model.encode_text()
-
     def forward(self, images):
-        features = self.encode_image(images)        # [B, E, h, w]
-        features_ = features.transpose(1, 3)        # [B, w, h, E]
-        output_ = features_ @ self.zeroshot_weights # [B, w, h, C]
-        output = output_.transpose(1, 3)            # [B, C, h, w]
+        # [B, E, h, w]
+        features = self.encode_image(images)
+        # [B, w, h, E]
+        features_ = features.transpose(1, 3)
+        # [B, w, h, C]
+        output_ = features_ @ self.zeroshot_weights
+        # [B, C, h, w]
+        output = output_.transpose(1, 3)
         return output
 
     @staticmethod
