@@ -23,3 +23,11 @@ def test_denseclip_encode_image(device):
 def test_zeroshot_weights_shape(device):
     model = DenseClip('RN50', classnames=classnames, templates=templates, device=device)
     assert model.zeroshot_weights.shape == torch.Size([1024, len(classnames)])
+
+
+def test_denseclip_forward(device):
+    model = DenseClip('RN50', classnames=classnames, templates=templates, device=device)
+    batch_size = 5
+    images = torch.rand((batch_size, 3, 224, 224), device=device)
+    output = model(images)
+    assert output.shape == torch.Size([batch_size, len(classnames), 7, 7])

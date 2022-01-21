@@ -1,11 +1,10 @@
 import json
 from collections import OrderedDict
-from pathlib import Path
 from typing import Union, List
 
+import clip
 import torch
 import torch.nn as nn
-import clip
 
 from libs.definitions import ROOT
 
@@ -183,8 +182,12 @@ class DenseClip(nn.Module):
     def encode_text(self, text):
         self.clip_model.encode_text()
 
-    def forward(self, x):
-        pass
+    def forward(self, images):
+        features = self.encode_image(images)        # [B, E, h, w]
+        features_ = features.transpose(1, 3)        # [B, w, h, E]
+        output_ = features_ @ self.zeroshot_weights # [B, w, h, C]
+        output = output_.transpose(1, 3)            # [B, C, h, w]
+        return output
 
     @staticmethod
     def available_models():
