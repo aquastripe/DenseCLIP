@@ -188,11 +188,11 @@ class DenseClip(nn.Module):
         # [B, E, h, w]
         features = self.encode_image(images)
         # [B, w, h, E]
-        features_ = features.transpose(1, 3)
+        features_t = features.transpose(1, 3)
         # [B, w, h, C]
-        output_ = features_ @ self.zeroshot_weights
+        output_t = features_t @ self.zeroshot_weights
         # [B, C, h, w]
-        output = output_.transpose(1, 3)
+        output = output_t.transpose(1, 3)
         output = F.interpolate(output, size=images.shape[-2:], mode='bilinear')
         return output
 
