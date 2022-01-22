@@ -5,6 +5,7 @@ from typing import Union, List
 import clip
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from libs.definitions import ROOT
 
@@ -188,6 +189,7 @@ class DenseClip(nn.Module):
         output_ = features_ @ self.zeroshot_weights
         # [B, C, h, w]
         output = output_.transpose(1, 3)
+        output = F.interpolate(output, size=images.shape[-2:], mode='bilinear')
         return output
 
     @staticmethod

@@ -30,4 +30,4 @@ def test_denseclip_forward(device):
     batch_size = 5
     images = torch.rand((batch_size, 3, 224, 224), device=device)
     output = model(images)
-    assert output.shape == torch.Size([batch_size, len(classnames), 7, 7])
+    assert output.shape == torch.Size([batch_size, len(classnames), 224, 224])
