@@ -137,6 +137,7 @@ class DenseClip(nn.Module):
             OrderedDict(weight=self.visual.attnpool.c_proj.weight.reshape(conv2_weight_shape),
                         bias=self.visual.attnpool.c_proj.bias))
 
+    @torch.no_grad()
     def _init_zeroshot_classifier(self, classnames, templates, device):
         # refer to: https://github.com/openai/CLIP/blob/main/notebooks/Prompt_Engineering_for_ImageNet.ipynb
         zeroshot_weights = []

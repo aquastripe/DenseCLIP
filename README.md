@@ -4,5 +4,5 @@ An unofficial implementation for paper "DenseCLIP: Extract Free Dense Labels fro
 
 ## Issues
 
-- Encoding for each template cost 2 GB memory. 85 templates may consume 170 GB memory.
+- ~~Encoding for each template cost 2 GB memory. 85 templates may consume 170 GB memory.~~ (resolved)
 

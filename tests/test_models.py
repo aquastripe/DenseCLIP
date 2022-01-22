@@ -26,8 +26,8 @@ def test_zeroshot_weights_shape(device):
 
 
 def test_denseclip_forward(device):
-    model = DenseClip('RN50', classnames=classnames, templates=templates, device=device)
+    model = DenseClip('RN50', device=device)
     batch_size = 5
     images = torch.rand((batch_size, 3, 224, 224), device=device)
     output = model(images)
-    assert output.shape == torch.Size([batch_size, len(classnames), 224, 224])
+    assert output.shape == torch.Size([batch_size, 1000, 224, 224])
