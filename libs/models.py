@@ -143,15 +143,15 @@ class DenseClip(nn.Module):
         zeroshot_weights = []
         for classname in classnames:
             if classname == 'background':
-                class_embeddings = torch.randn(1024)
+                class_embedding = torch.randn(1024, dtype=torch.float16, device=device)
             else:
                 texts = [template.format(classname) for template in templates]  # format with class
                 texts = clip.tokenize(texts).to(device)  # tokenize
                 class_embeddings = self.clip_model.encode_text(texts)  # embed with text encoder
+                class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
+                class_embedding = class_embeddings.mean(dim=0)
+                class_embedding /= class_embedding.norm()
 
-            class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
-            class_embedding = class_embeddings.mean(dim=0)
-            class_embedding /= class_embedding.norm()
             zeroshot_weights.append(class_embedding)
 
         # shape: [E, C]
