@@ -197,3 +197,56 @@ class DenseClip(nn.Module):
     @staticmethod
     def available_models():
         return DenseClip._AVAILABLE_MODELS
+
+
+class Clip(nn.Module):
+    _AVAILABLE_MODELS = ['RN50', 'RN50x16']  # refer to Table 3. in the paper
+
+    def __init__(self,
+                 name: str,
+                 classnames: List[str] = None,
+                 templates: List[str] = None,
+                 device: Union[str, torch.device] = 'cuda' if torch.cuda.is_available() else 'cpu',
+                 jit: bool = False, download_root: str = None):
+        super(Clip, self).__init__()
+        self.clip_model, self.preprocess = clip.load(name, device, jit, download_root)
+
+        if classnames is None:
+            classnames = _DEFAULT_CLASSNAMES
+
+        if templates is None:
+            templates = _DEFAULT_TEMPLATES
+
+        self._init_zeroshot_classifier(classnames, templates, device)
+
+    @torch.no_grad()
+    def _init_zeroshot_classifier(self, classnames, templates, device):
+        # refer to: https://github.com/openai/CLIP/blob/main/notebooks/Prompt_Engineering_for_ImageNet.ipynb
+        zeroshot_weights = []
+        for classname in classnames:
+            texts = [template.format(classname) for template in templates]  # format with class
+            texts = clip.tokenize(texts).to(device)  # tokenize
+            class_embeddings = self.clip_model.encode_text(texts)  # embed with text encoder
+            class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
+            class_embedding = class_embeddings.mean(dim=0)
+            class_embedding /= class_embedding.norm()
+
+            zeroshot_weights.append(class_embedding)
+
+        # shape: [E, C]
+        # where E is the dimension of an embedding and C is the number of classes.
+        self.zeroshot_weights = torch.stack(zeroshot_weights, dim=1).to(device)
+
+    def encode_image(self, image):
+        feature = self.clip_model.encode_image(image)
+        feature /= feature.norm(dim=-1, keepdim=True)
+        return feature
+
+    def forward(self, images):
+        features = self.encode_image(images)
+        output = features @ self.zeroshot_weights
+        return F.softmax(output, dim=-1)
+
+    @staticmethod
+    def available_models():
+        return Clip._AVAILABLE_MODELS
