@@ -1,6 +1,5 @@
 import argparse
 
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -10,21 +9,13 @@ from mmseg.core.evaluation import get_palette, get_classes
 from torchvision.utils import draw_segmentation_masks
 
 from libs.models import DenseClip
+from libs.visualization import plot_images
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=str)
     return parser.parse_args()
-
-
-def plot_images(images, filename):
-    fig, ax = plt.subplots(ncols=len(images), tight_layout=True, figsize=(7.1, 2.41))
-    for i, image in enumerate(images):
-        ax[i].imshow(image)
-        ax[i].set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
-
-    fig.savefig(filename)
 
 
 @torch.no_grad()
