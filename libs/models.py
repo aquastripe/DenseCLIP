@@ -141,18 +141,13 @@ class DenseClip(nn.Module):
     def _init_zeroshot_classifier(self, classnames, templates, device):
         # refer to: https://github.com/openai/CLIP/blob/main/notebooks/Prompt_Engineering_for_ImageNet.ipynb
         zeroshot_weights = []
-        dim = 0
         for classname in classnames:
-            if classname == 'background':
-                class_embedding = torch.randn(dim, dtype=torch.float16, device=device)
-            else:
-                texts = [template.format(classname) for template in templates]  # format with class
-                texts = clip.tokenize(texts).to(device)  # tokenize
-                class_embeddings = self.clip_model.encode_text(texts)  # embed with text encoder
-                class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
-                class_embedding = class_embeddings.mean(dim=0)
-                class_embedding /= class_embedding.norm()
-                dim = class_embedding.shape[-1]
+            texts = [template.format(classname) for template in templates]  # format with class
+            texts = clip.tokenize(texts).to(device)  # tokenize
+            class_embeddings = self.clip_model.encode_text(texts)  # embed with text encoder
+            class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
+            class_embedding = class_embeddings.mean(dim=0)
+            class_embedding /= class_embedding.norm()
 
             zeroshot_weights.append(class_embedding)
 
