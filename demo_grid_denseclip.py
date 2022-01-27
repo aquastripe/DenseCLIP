@@ -13,7 +13,7 @@ from torchvision.utils import draw_segmentation_masks
 
 from libs.datasets import OxfordIIITPet
 from libs.models import DenseClip, Clip
-from libs.visualization import plot_image_grid
+from libs.visualization import plot_image_grid, plot_color_class
 
 np.random.seed(0)
 
@@ -80,11 +80,14 @@ def main():
 
     # quantize color map
     color_map = plt.get_cmap('turbo')
-    colors = np.array(color_map.colors) * 256
+    colors = np.array(color_map.colors)
+    colors = colors * 256
     colors = colors.astype(int)
     color_indices = np.linspace(0, 255, len(dataset.classes)).astype(int)
     palette = [tuple(colors[color_index])
                for color_index in color_indices]
+    plot_color_class(dataset.classes, palette, 'color_class_reference.png')
+
     for idx in indices[:n_samples]:
         with Image.open(dataset.filenames[idx], 'r').convert('RGB') as image:
             image_tensor = TF.to_tensor(image).multiply(255).to(torch.uint8)
