@@ -33,10 +33,11 @@ def main():
     dataloader = DataLoader(dataset, batch_size=64, num_workers=8)
     templates = ['A photo of a {}, a type of pet.']
     model = Clip('RN50', dataset.classes, templates, args.device)
+    model.eval()
 
-    with torch.no_grad():
-        sum_top1, sum_top5, n = 0., 0., 0.
-        for i, (images, labels) in enumerate(tqdm(dataloader)):
+    sum_top1, sum_top5, n = 0., 0., 0.
+    for i, (images, labels) in enumerate(tqdm(dataloader)):
+        with torch.no_grad():
             images, labels = images.to(args.device), labels.to(args.device)
             probs = model(images)
 
@@ -45,11 +46,11 @@ def main():
             sum_top5 += top5
             n += images.size(0)
 
-        top1 = (sum_top1 / n)
-        top5 = (sum_top5 / n)
+    top1 = sum_top1 / n
+    top5 = sum_top5 / n
 
-        print(f'Top-1 accuracy: {top1: .4f}')
-        print(f'Top-5 accuracy: {top5: .4f}')
+    print(f'Top-1 accuracy: {top1: .4f}')
+    print(f'Top-5 accuracy: {top5: .4f}')
 
 
 if __name__ == '__main__':
