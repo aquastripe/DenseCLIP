@@ -15,6 +15,7 @@ from libs.visualization import plot_images
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=str)
+    parser.add_argument('--filename', type=str)
     return parser.parse_args()
 
 
@@ -29,7 +30,7 @@ def main():
     model.eval()
     threshold = 0.7
 
-    filename = '2012_004325.jpg'
+    filename = args.filename
     with Image.open(filename, 'r') as image:
         image = image.convert('RGB')
         image_tensor = TF.to_tensor(image).multiply(255).to(torch.uint8)
@@ -53,7 +54,7 @@ def main():
         segmentation_masks = segmentation_masks.permute(1, 2, 0)
 
         images = [np.array(image), segmentation_masks]
-        plot_images(images, f'example_{filename}')
+        plot_images(images, f'segment_{filename}')
 
 
 if __name__ == '__main__':
